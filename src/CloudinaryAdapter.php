@@ -148,7 +148,7 @@ class CloudinaryAdapter implements AdapterInterface
     {
         $path = $this->removeExtension($path);
 
-        return $this->getMetadata($path);
+        return !is_null($this->api->getMimetype($path));
     }
 
     /**
@@ -262,7 +262,7 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function getMimetype($path)
     {
-        return false; //Cloudinary doesnt provide a mimetype
+        return $this->api->getMimetype($path);
     }
 
     /**

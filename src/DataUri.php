@@ -2,6 +2,8 @@
 
 namespace Enl\Flysystem\Cloudinary;
 
+use League\Flysystem\Exception;
+
 /**
  * Class DataUri
  * Creates DATA-URI formatted string from file content.
@@ -23,6 +25,10 @@ class DataUri
      */
     public function __construct($content)
     {
+        if (empty($content)) {
+            throw new Exception("Cloudinary does not support empty content");
+        }
+
         $this->content = $content;
     }
 

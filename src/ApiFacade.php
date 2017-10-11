@@ -87,4 +87,25 @@ class ApiFacade extends BaseApi
     {
         return cloudinary_url($path, $transformations);
     }
+
+    public function getMimetype($publicId)
+    {
+        $url = $this->url($publicId);
+
+        stream_context_set_default(
+            array(
+                'http' => array(
+                    'method' => 'HEAD',
+                ),
+            )
+        );
+        $file_headers = @get_headers($url, 1);
+
+        if (strpos($file_headers[0], '200 OK') === false) {
+            return null;
+        }
+
+        return $file_headers['Content-Type'];
+    }
+
 }
