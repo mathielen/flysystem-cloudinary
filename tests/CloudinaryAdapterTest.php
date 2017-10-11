@@ -31,18 +31,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
     }
 
     /**
-     * @test
-     * @dataProvider adapterProvider
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     */
-    public function writeShouldReturnFalseOnFailure(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('upload')->withAnyArgs()->andThrow('\Cloudinary\Error', 'Error!');
-        $this->assertFalse($cloudinary->write('path', 'contents', new Config()));
-    }
-
-    /**
      * @param CloudinaryAdapter $cloudinary
      * @param MockInterface $api
      * @test
@@ -58,18 +46,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
         $this->assertEquals($path, $response['path']);
         $this->assertArrayHasKey('size', $response);
         $this->assertEquals(123123, $response['size']);
-    }
-
-    /**
-     * @test
-     * @dataProvider adapterProvider
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     */
-    public function updateShouldReturnFalseOnFailure(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('upload')->withAnyArgs()->andThrow('\Cloudinary\Error', 'Error!');
-        $this->assertFalse($cloudinary->update('path', 'contents', new Config()));
     }
 
     /**
@@ -96,18 +72,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
      * @test
      * @dataProvider adapterProvider
      */
-    public function writeStreamShouldReturnFalseOnFailure(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('upload')->withAnyArgs()->andThrow('\Cloudinary\Error', 'Error!');
-        $this->assertFalse($cloudinary->writeStream('path', tmpfile(), new Config()));
-    }
-
-    /**
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     * @test
-     * @dataProvider adapterProvider
-     */
     public function writeStreamShouldReturnMetadataOnSuccess(CloudinaryAdapter $cloudinary, MockInterface $api)
     {
         $path = 'test-path';
@@ -116,18 +80,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
 
         $this->assertArrayHasKey('path', $response);
         $this->assertEquals($path, $response['path']);
-    }
-
-    /**
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     * @test
-     * @dataProvider adapterProvider
-     */
-    public function renameShouldReturnFalseOnFailure(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('rename')->withArgs(['old', 'new'])->once()->andThrow('\Cloudinary\Error', 'Not Found!');
-        $this->assertFalse($cloudinary->rename('old', 'new'));
     }
 
     /**
@@ -163,39 +115,12 @@ class CloudinaryAdapterTest extends MockeryTestCase
      * @test
      * @dataProvider adapterProvider
      */
-    public function deleteShouldReturnFalseOnException(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('delete_resources')
-            ->with(['file'])
-            ->once()
-            ->andThrow('\Cloudinary\Api\Error');
-        $this->assertFalse($cloudinary->delete('file'));
-    }
-
-    /**
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     * @test
-     * @dataProvider adapterProvider
-     */
     public function deleteShouldReturnTrueOnSuccess(CloudinaryAdapter $cloudinary, MockInterface $api)
     {
         $api->shouldReceive('delete_resources')
             ->with(['file'])
             ->once()->andReturn(['deleted' => ['file' => 'deleted']]);
         $this->assertTrue($cloudinary->delete('file'));
-    }
-
-    /**
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     * @test
-     * @dataProvider adapterProvider
-     */
-    public function readShouldReturnFalseOnFailure(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('content')->with('file')->once()->andThrow('\Cloudinary\Error', 'Not found');
-        $this->assertFalse($cloudinary->read('file'));
     }
 
     /**
@@ -216,18 +141,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
      * @test
      * @dataProvider adapterProvider
      */
-    public function readStreamShouldReturnFalseOnFailure(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('content')->with('file')->once()->andThrow('\Cloudinary\Error', 'Not found');
-        $this->assertFalse($cloudinary->readStream('file'));
-    }
-
-    /**
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     * @test
-     * @dataProvider adapterProvider
-     */
     public function readStreamShouldReturnArrayOnSuccess(CloudinaryAdapter $cloudinary, MockInterface $api)
     {
         $api->shouldReceive('content')->with('file')->once()->andReturn(tmpfile());
@@ -236,18 +149,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
         $this->assertInternalType('array', $response);
         $this->assertEquals('file', $response['path']);
         $this->assertInternalType('resource', $response['stream']);
-    }
-
-    /**
-     * @param CloudinaryAdapter $cloudinary
-     * @param MockInterface $api
-     * @test
-     * @dataProvider adapterProvider
-     */
-    public function listContentsShouldReturnEmptyArrayOnError(CloudinaryAdapter $cloudinary, MockInterface $api)
-    {
-        $api->shouldReceive('resources')->withAnyArgs()->andThrow('\Cloudinary\Error', 'oops');
-        $this->assertEquals([], $cloudinary->listContents());
     }
 
     /**
@@ -353,20 +254,6 @@ class CloudinaryAdapterTest extends MockeryTestCase
     }
 
     /**
-     * @param $method
-     * @test
-     * @dataProvider metadataProvider
-     */
-    public function testMetadataCallsFailure($method)
-    {
-        list($cloudinary, $api) = $this->adapterProvider()[0];
-
-        /** @var MockInterface $api */
-        $api->shouldReceive('resource')->once()->andThrow('Cloudinary\Api\Error');
-        $this->assertFalse($cloudinary->{$method}('path'));
-    }
-
-    /**
      * @test
      * @expectedException \LogicException
      */
@@ -421,17 +308,4 @@ class CloudinaryAdapterTest extends MockeryTestCase
         $this->assertTrue($adapter->deleteDir('path/'));
     }
 
-    /**
-     * @param CloudinaryAdapter $adapter
-     * @param MockInterface $api
-     *
-     * @test
-     * @dataProvider adapterProvider
-     */
-    public function deleteDirShouldReturnFalseOnFailure(CloudinaryAdapter $adapter, MockInterface $api)
-    {
-        $api->shouldReceive('delete_resources_by_prefix')->andThrow('\Cloudinary\Api\Error');
-
-        $this->assertFalse($adapter->deleteDir('path/'));
-    }
 }
