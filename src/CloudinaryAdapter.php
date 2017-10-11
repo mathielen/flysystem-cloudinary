@@ -15,7 +15,9 @@ class CloudinaryAdapter implements AdapterInterface
     private $api;
 
     use NotSupportingVisibilityTrait; // We have no visibility for paths, due all of them are public
+
     use StreamedTrait; // We have no streaming in Cloudinary API, so we need this polyfill
+
     use StreamedCopyTrait;
 
     public function __construct(ApiFacade $api)
@@ -28,7 +30,7 @@ class CloudinaryAdapter implements AdapterInterface
      *
      * @param string $path
      * @param string $contents
-     * @param Config $config   Config object
+     * @param Config $config Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -56,7 +58,7 @@ class CloudinaryAdapter implements AdapterInterface
      *
      * @param string $path
      * @param string $contents
-     * @param Config $config   Config object
+     * @param Config $config Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -77,7 +79,7 @@ class CloudinaryAdapter implements AdapterInterface
     public function rename($path, $newpath)
     {
         try {
-            return (bool) $this->api->rename($path, $newpath);
+            return (bool)$this->api->rename($path, $newpath);
         } catch (\Exception $e) {
             return false;
         }
@@ -111,7 +113,7 @@ class CloudinaryAdapter implements AdapterInterface
     public function deleteDir($dirname)
     {
         try {
-            $response = $this->api->delete_resources_by_prefix(rtrim($dirname, '/').'/');
+            $response = $this->api->delete_resources_by_prefix(rtrim($dirname, '/') . '/');
 
             return is_array($response['deleted']);
         } catch (Api\Error $e) {
@@ -132,7 +134,7 @@ class CloudinaryAdapter implements AdapterInterface
     public function createDir($dirname, Config $config)
     {
         return [
-            'path' => rtrim($dirname, '/').'/',
+            'path' => rtrim($dirname, '/') . '/',
             'type' => 'dir',
         ];
     }
@@ -190,7 +192,7 @@ class CloudinaryAdapter implements AdapterInterface
      * because they treat filename prefixes as folders.
      *
      * @param string $directory
-     * @param bool   $recursive
+     * @param bool $recursive
      *
      * @return array
      */
@@ -262,7 +264,9 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function getMimetype($path)
     {
-        return $this->api->getMimetype($path);
+        return [
+            'mimetype' => $this->api->getMimetype($path)
+        ];
     }
 
     /**

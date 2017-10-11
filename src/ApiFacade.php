@@ -72,14 +72,14 @@ class ApiFacade extends BaseApi
      */
     public function content($path)
     {
-        return fopen($this->url($path), 'r');
+        return fopen($this->url($path), 'rb');
     }
 
     /**
      * Returns URL of file with given $path and $transformations.
      *
      * @param string $path
-     * @param array  $transformations
+     * @param array $transformations
      *
      * @return string
      */
@@ -92,14 +92,12 @@ class ApiFacade extends BaseApi
     {
         $url = $this->url($publicId);
 
-        stream_context_set_default(
-            array(
-                'http' => array(
-                    'method' => 'HEAD',
-                ),
-            )
-        );
-        $file_headers = @get_headers($url, 1);
+        $context = stream_context_create([
+            "http" => [
+                "method" => "HEAD"
+            ]
+        ]);
+        $file_headers = @get_headers($url, 1, $context);
 
         if (strpos($file_headers[0], '200 OK') === false) {
             return null;
