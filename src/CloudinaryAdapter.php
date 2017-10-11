@@ -261,7 +261,7 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function getMimetype($path)
     {
-        return $this->getMetadata($path);
+        return false;
     }
 
     /**
