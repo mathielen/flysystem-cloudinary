@@ -215,8 +215,7 @@ class CloudinaryAdapterTest extends MockeryTestCase
         return [
             ['getMetadata'],
             ['getTimestamp'],
-            ['getSize'],
-            ['has'],
+            ['getSize']
         ];
     }
 

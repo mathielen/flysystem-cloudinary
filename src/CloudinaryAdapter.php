@@ -127,7 +127,7 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function has($path)
     {
-        return $this->getMetadata($path);
+        return $this->api->fileExists($path);
     }
 
     /**
