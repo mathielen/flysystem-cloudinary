@@ -49,7 +49,11 @@ class ApiFacade extends BaseApi
      */
     public function upload($path, $contents)
     {
-        return Uploader::upload(new DataUri($contents), ['public_id' => $path]);
+        if (!substr($contents,0,5) === 'data:') {
+            $contents = new DataUri($contents);
+        }
+
+        return Uploader::upload($contents, ['public_id' => $path]);
     }
 
     /**
