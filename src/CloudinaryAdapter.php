@@ -38,11 +38,7 @@ class CloudinaryAdapter implements AdapterInterface
     {
         $path = $this->removeExtension($path);
 
-        try {
-            return $this->normalizeMetadata($this->api->upload($path, $contents));
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $this->normalizeMetadata($this->api->upload($path, $contents));
     }
 
     private function removeExtension($path)
@@ -78,11 +74,7 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function rename($path, $newpath)
     {
-        try {
-            return (bool)$this->api->rename($path, $newpath);
-        } catch (\Exception $e) {
-            return false;
-        }
+        return (bool)$this->api->rename($path, $newpath);
     }
 
     /**
@@ -94,13 +86,9 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function delete($path)
     {
-        try {
-            $response = $this->api->delete_resources([$path]);
+        $response = $this->api->delete_resources([$path]);
 
-            return $response['deleted'][$path] === 'deleted';
-        } catch (Api\Error $e) {
-            return false;
-        }
+        return $response['deleted'][$path] === 'deleted';
     }
 
     /**
@@ -112,13 +100,9 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function deleteDir($dirname)
     {
-        try {
-            $response = $this->api->delete_resources_by_prefix(rtrim($dirname, '/') . '/');
+        $response = $this->api->delete_resources_by_prefix(rtrim($dirname, '/') . '/');
 
-            return is_array($response['deleted']);
-        } catch (Api\Error $e) {
-            return false;
-        }
+        return is_array($response['deleted']);
     }
 
     /**
@@ -176,14 +160,10 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function readStream($path)
     {
-        try {
-            return [
-                'stream' => $this->api->content($path),
-                'path' => $path,
-            ];
-        } catch (\Exception $e) {
-            return false;
-        }
+        return [
+            'stream' => $this->api->content($path),
+            'path' => $path,
+        ];
     }
 
     /**
@@ -198,11 +178,7 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function listContents($directory = '', $recursive = false)
     {
-        try {
-            return $this->doListContents($directory);
-        } catch (\Exception $e) {
-            return [];
-        }
+        return $this->doListContents($directory);
     }
 
     private function doListContents($directory = '', array $storage = [])
@@ -236,11 +212,7 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function getMetadata($path)
     {
-        try {
-            return $this->normalizeMetadata($this->api->resource($path));
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $this->normalizeMetadata($this->api->resource($path));
     }
 
     /**
