@@ -49,7 +49,7 @@ class ApiFacade extends BaseApi
      */
     public function upload($path, $contents)
     {
-        if (!substr($contents,0,5) === 'data:') {
+        if (substr($contents,0,5) !== 'data:') {
             $contents = new DataUri($contents);
         }
 
