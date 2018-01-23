@@ -89,6 +89,8 @@ class ApiFacade extends BaseApi
      */
     public function url($path, array $transformations = [])
     {
+        $transformations['version'] = time(); //cachebuster
+
         return cloudinary_url($path, $transformations);
     }
 
