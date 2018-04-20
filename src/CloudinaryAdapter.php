@@ -3,13 +3,14 @@
 namespace Enl\Flysystem\Cloudinary;
 
 use Cloudinary\Api;
+use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
 use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
 use League\Flysystem\Adapter\Polyfill\StreamedTrait;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 
-class CloudinaryAdapter implements AdapterInterface
+class CloudinaryAdapter extends AbstractAdapter
 {
     /** @var ApiFacade */
     private $api;
@@ -20,9 +21,10 @@ class CloudinaryAdapter implements AdapterInterface
 
     use StreamedCopyTrait;
 
-    public function __construct(ApiFacade $api)
+    public function __construct(ApiFacade $api, $prefix = null)
     {
         $this->api = $api;
+        $this->setPathPrefix($prefix);
     }
 
     /**
@@ -37,6 +39,8 @@ class CloudinaryAdapter implements AdapterInterface
     public function write($path, $contents, Config $config)
     {
         $path = $this->removeExtension($path);
+
+        $path = $this->applyPathPrefix($path);
 
         return $this->normalizeMetadata($this->api->upload($path, $contents));
     }
@@ -60,6 +64,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function update($path, $contents, Config $config)
     {
+        $path = $this->applyPathPrefix($path);
+
         // Cloudinary does not distinguish create and update
         return $this->write($path, $contents, $config);
     }
@@ -74,6 +80,9 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function rename($path, $newpath)
     {
+        $path = $this->applyPathPrefix($path);
+        $newpath = $this->applyPathPrefix($newpath);
+
         return (bool)$this->api->rename($path, $newpath);
     }
 
@@ -86,6 +95,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function delete($path)
     {
+        $path = $this->applyPathPrefix($path);
+
         $response = $this->api->delete_resources([$path]);
 
         return $response['deleted'][$path] === 'deleted';
@@ -100,6 +111,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function deleteDir($dirname)
     {
+        $dirname = $this->applyPathPrefix($dirname);
+
         $response = $this->api->delete_resources_by_prefix(rtrim($dirname, '/') . '/');
 
         return is_array($response['deleted']);
@@ -117,6 +130,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function createDir($dirname, Config $config)
     {
+        $dirname = $this->applyPathPrefix($dirname);
+
         return [
             'path' => rtrim($dirname, '/') . '/',
             'type' => 'dir',
@@ -132,6 +147,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function has($path)
     {
+        $path = $this->applyPathPrefix($path);
+
         $path = $this->removeExtension($path);
 
         return !is_null($this->api->getMimetype($path));
@@ -160,6 +177,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function readStream($path)
     {
+        $path = $this->applyPathPrefix($path);
+
         return [
             'stream' => $this->api->content($path),
             'path' => $path,
@@ -178,6 +197,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function listContents($directory = '', $recursive = false)
     {
+        $directory = $this->applyPathPrefix($directory);
+
         return $this->doListContents($directory);
     }
 
@@ -212,6 +233,8 @@ class CloudinaryAdapter implements AdapterInterface
      */
     public function getMetadata($path)
     {
+        $path = $this->applyPathPrefix($path);
+
         return $this->normalizeMetadata($this->api->resource($path));
     }
 
