@@ -38,11 +38,16 @@ class CloudinaryAdapter extends AbstractAdapter
      */
     public function write($path, $contents, Config $config)
     {
-        $path = $this->removeExtension($path);
-
         $path = $this->applyPathPrefix($path);
 
         return $this->normalizeMetadata($this->api->upload($path, $contents));
+    }
+
+    public function applyPathPrefix($path)
+    {
+        $path = $this->removeExtension($path);
+
+        return parent::applyPathPrefix($path);
     }
 
     private function removeExtension($path)
@@ -148,8 +153,6 @@ class CloudinaryAdapter extends AbstractAdapter
     public function has($path)
     {
         $path = $this->applyPathPrefix($path);
-
-        $path = $this->removeExtension($path);
 
         return !is_null($this->api->getMimetype($path));
     }
