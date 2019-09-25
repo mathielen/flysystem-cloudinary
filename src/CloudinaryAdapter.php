@@ -237,8 +237,19 @@ class CloudinaryAdapter extends AbstractAdapter
     public function getMetadata($path)
     {
         $path = $this->applyPathPrefix($path);
+        $apiMetadata = $this->api->getMetadata($path);
 
-        return $this->normalizeMetadata($this->api->resource($path));
+        if (!$apiMetadata) {
+            return null;
+        }
+
+        return [
+            'hash' => str_replace('"', '', $apiMetadata['Etag']), //somehow there are double "'s
+            'type' => 'file',
+            'path' => $path,
+            'size' => array_key_exists('Content-Length', $apiMetadata) ? $apiMetadata['Content-Length'] : false,
+            'timestamp' => array_key_exists('Last-Modified', $apiMetadata) ? strtotime($apiMetadata['Last-Modified']) : false,
+        ];
     }
 
     /**

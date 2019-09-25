@@ -94,7 +94,7 @@ class ApiFacade extends BaseApi
         return cloudinary_url($path, $transformations);
     }
 
-    public function getMimetype($publicId)
+    public function getMetadata($publicId)
     {
         $url = $this->url($publicId);
 
@@ -109,7 +109,14 @@ class ApiFacade extends BaseApi
             return null;
         }
 
-        return $file_headers['Content-Type'];
+        return $file_headers;
+    }
+
+    public function getMimetype($publicId)
+    {
+        $metadata = $this->getMetadata($publicId);
+
+        return $metadata ? $metadata['Content-Type']: null;
     }
 
 }
