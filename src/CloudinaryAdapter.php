@@ -182,7 +182,7 @@ class CloudinaryAdapter extends AbstractAdapter
     {
         $path = $this->applyPathPrefix($path);
 
-		$seekableStream = fopen('php://memory', 'r+');
+		$seekableStream = fopen('php://temp', 'r+');
 		stream_copy_to_stream($this->api->content($path), $seekableStream);
 		rewind($seekableStream);
 
